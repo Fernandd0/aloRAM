@@ -7,33 +7,59 @@ export const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3
 
 let vapiInstance: any = null;
 
-export function getVapiInstance(): any {
-  if (!vapiInstance) {
-    try {
-      let VapiSDK: any = VapiWeb;
-      if (Platform.OS !== 'web') {
-        try {
-          const nativeModule = require('@vapi-ai/react-native');
-          VapiSDK = nativeModule?.default || nativeModule || VapiWeb;
-        }
-        catch (e) {
-          console.warn('VapiNative require failed, falling back to VapiWeb:', e);
-          VapiSDK = VapiWeb;
+function createMockVapi(errorMessage: string) {
+  const listeners: Record<string, Array<(...args: any[]) => void>> = {};
+  return {
+    on: (event: string, fn: (...args: any[]) => void) => {
+      listeners[event] = listeners[event] || [];
+      listeners[event].push(fn);
+    },
+    removeAllListeners: () => {
+      for (const k in listeners) {
+        delete listeners[k];
+      }
+    },
+    start: async () => {
+      if (listeners.error) {
+        for (const fn of listeners.error) {
+          fn(errorMessage);
         }
       }
-      vapiInstance = new VapiSDK(VAPI_PUBLIC_KEY);
+      throw new Error(errorMessage);
+    },
+    stop: () => {
+      if (listeners['call-end']) {
+        for (const fn of listeners['call-end']) {
+          fn();
+        }
+      }
+    },
+    setMuted: () => {},
+  };
+}
+
+export function getVapiInstance(): any {
+  if (!vapiInstance) {
+    if (Platform.OS === 'web') {
+      try {
+        vapiInstance = new VapiWeb(VAPI_PUBLIC_KEY);
+      }
+      catch (e) {
+        console.warn('VapiWeb init error:', e);
+        vapiInstance = createMockVapi('No se pudo inicializar el cliente Vapi Web.');
+      }
     }
-    catch (e) {
-      console.warn('Vapi SDK init failed, using fallback mock:', e);
-      vapiInstance = {
-        on: () => {},
-        removeAllListeners: () => {},
-        start: async () => {
-          throw new Error('SDK de voz no compatible en este cliente. Usa Expo Development Build o Web.');
-        },
-        stop: () => {},
-        setMuted: () => {},
-      };
+    else {
+      try {
+        const VapiNative = require('@vapi-ai/react-native').default || require('@vapi-ai/react-native');
+        vapiInstance = new VapiNative(VAPI_PUBLIC_KEY);
+      }
+      catch (e) {
+        console.warn('VapiNative not available (requires Expo Development Build):', e);
+        vapiInstance = createMockVapi(
+          'Las llamadas nativas de voz requieren un Development Build (npx expo run:android / run:ios) o probar en Web (pnpm web).',
+        );
+      }
     }
   }
   return vapiInstance;
