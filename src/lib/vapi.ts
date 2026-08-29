@@ -1,5 +1,5 @@
 import VapiWeb from '@vapi-ai/web';
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import 'react-native-get-random-values';
 
 const VAPI_PUBLIC_KEY = process.env.EXPO_PUBLIC_VAPI_API_KEY || '60639c9c-4ee0-4b4e-a801-487122d8f68b';
@@ -94,15 +94,26 @@ export function getVapiInstance(): any {
       }
     }
     else {
+      let isWebRTCSafe = false;
       try {
-        const VapiNative = require('@vapi-ai/react-native').default || require('@vapi-ai/react-native');
-        vapiInstance = new VapiNative(VAPI_PUBLIC_KEY);
+        isWebRTCSafe = Boolean(NativeModules && NativeModules.WebRTCModule);
       }
-      catch (e) {
-        console.warn('VapiNative TurboModule not supported in this client:', e);
-        vapiInstance = createMockVapi(
-          'Simulación aloRAM activa. Para voz WebRTC en vivo en móvil, usa Development Build (npx expo run:android). En Web (pnpm web) la voz funciona 100%.',
-        );
+      catch {
+        isWebRTCSafe = false;
+      }
+
+      if (isWebRTCSafe) {
+        try {
+          const VapiNative = require('@vapi-ai/react-native').default || require('@vapi-ai/react-native');
+          vapiInstance = new VapiNative(VAPI_PUBLIC_KEY);
+        }
+        catch (e) {
+          console.warn('VapiNative init failed:', e);
+          vapiInstance = createMockVapi('Simulación aloRAM activa.');
+        }
+      }
+      else {
+        vapiInstance = createMockVapi('Simulación aloRAM activa.');
       }
     }
   }
