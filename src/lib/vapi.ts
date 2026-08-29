@@ -7,27 +7,45 @@ export const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3
 
 let vapiInstance: any = null;
 
-function createMockVapi(errorMessage: string) {
+function createMockVapi(noticeMessage?: string) {
   const listeners: Record<string, Array<(...args: any[]) => void>> = {};
+  let timer: any = null;
+
   return {
     on: (event: string, fn: (...args: any[]) => void) => {
       listeners[event] = listeners[event] || [];
       listeners[event].push(fn);
     },
     removeAllListeners: () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
       for (const k in listeners) {
         delete listeners[k];
       }
     },
     start: async () => {
-      if (listeners.error) {
-        for (const fn of listeners.error) {
-          fn(errorMessage);
+      if (listeners['call-start']) {
+        for (const fn of listeners['call-start']) {
+          fn();
         }
       }
-      throw new Error(errorMessage);
+      timer = setTimeout(() => {
+        if (listeners.message) {
+          for (const fn of listeners.message) {
+            fn({
+              type: 'transcript',
+              role: 'assistant',
+              transcript: noticeMessage || '¡Hola! Soy aloRAM, tu asistente de salud. ¿Cómo te sientes hoy con tu tratamiento?',
+            });
+          }
+        }
+      }, 500);
     },
     stop: () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
       if (listeners['call-end']) {
         for (const fn of listeners['call-end']) {
           fn();
@@ -55,9 +73,9 @@ export function getVapiInstance(): any {
         vapiInstance = new VapiNative(VAPI_PUBLIC_KEY);
       }
       catch (e) {
-        console.warn('VapiNative not available (requires Expo Development Build):', e);
+        console.warn('VapiNative TurboModule not supported in this client:', e);
         vapiInstance = createMockVapi(
-          'Las llamadas nativas de voz requieren un Development Build (npx expo run:android / run:ios) o probar en Web (pnpm web).',
+          'Simulación aloRAM activa. Para voz WebRTC en vivo en móvil, usa Development Build (npx expo run:android). En Web (pnpm web) la voz funciona 100%.',
         );
       }
     }
