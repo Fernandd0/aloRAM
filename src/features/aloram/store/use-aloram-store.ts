@@ -30,11 +30,11 @@ type AloRAMState = {
 };
 
 const initialUser: UserProfile = {
-  name: 'María García',
-  phone: '+51 987654321',
-  age: '64',
+  name: 'Omar',
+  phone: '987654321',
+  age: '38',
   checkinPreference: 'both',
-  emergencyContactName: 'Carlos García (Hijo)',
+  emergencyContactName: 'Contacto de Emergencia',
   emergencyContactPhone: '+51 912345678',
 };
 

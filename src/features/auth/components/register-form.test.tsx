@@ -20,16 +20,15 @@ describe('registerForm', () => {
     const button = screen.getByTestId('register-button');
 
     await user.press(button);
-    expect(await screen.findByText(/El DNI debe tener al menos 8 dígitos/i)).toBeOnTheScreen();
+    expect(await screen.findByText(/Ingrese un teléfono válido/i)).toBeOnTheScreen();
     expect(screen.getByText(/Ingrese un nombre válido/i)).toBeOnTheScreen();
   });
 
   it('calls onSubmit with valid form data', async () => {
     const { user } = setup(<RegisterForm onSubmit={onSubmitMock} />);
 
-    await user.type(screen.getByTestId('dni-input'), '72849102');
+    await user.type(screen.getByTestId('phone-input'), '+51987654321');
     await user.type(screen.getByTestId('name-input'), 'Juan Pérez');
-    await user.type(screen.getByTestId('email-input'), 'juan@vacunacare.org');
     await user.type(screen.getByTestId('password-input'), '123456');
     await user.type(screen.getByTestId('confirm-password-input'), '123456');
 
@@ -41,9 +40,8 @@ describe('registerForm', () => {
 
     expect(onSubmitMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        dni: '72849102',
+        phone: '+51987654321',
         name: 'Juan Pérez',
-        email: 'juan@vacunacare.org',
       }),
     );
   });

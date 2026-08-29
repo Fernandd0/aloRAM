@@ -1,79 +1,118 @@
 import * as React from 'react';
 import { FocusAwareStatusBar, Input, Pressable, ScrollView, Text, View } from '@/components/ui';
 import { setVapiMuted, startVapiCall, stopVapiCall } from '@/lib/vapi';
-import { AloRAMAvatar } from './components/aloram-avatar';
 import { useAloRAMStore } from './store/use-aloram-store';
 
-function CallSummaryView({ med, setMed, desc, setDesc, sev, setSev, onSave }: any) {
+function SummaryCardView({ med, setMed, desc, setDesc, sev, setSev, onSave }: any) {
   return (
-    <View className="flex-1 bg-stone-50 p-6 pt-12">
-      <Text className="text-2xl font-extrabold text-emerald-800">Esto fue lo que entendí</Text>
-      <Text className="mb-4 text-sm text-stone-600">Resumen de tu llamada de voz con aloRAM.</Text>
+    <View className="flex-1 bg-[#F5F2E9] p-5 pt-10">
+      <Text className="text-2xl font-black text-stone-900">📝 Nota Final aloRAM</Text>
+      <Text className="mb-3 text-xs text-stone-500">Resumen procesado automáticamente tras finalizar la llamada.</Text>
+
       <ScrollView className="flex-1 space-y-4">
-        <View className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
-          <Input value={med} onChangeText={setMed} label="Medicamento" />
-          <Input value={desc} onChangeText={setDesc} label="¿Qué sentiste?" multiline />
-          <Text className="mt-4 mb-2 text-xs font-bold text-stone-400 uppercase">Intensidad</Text>
+        <View className="space-y-4 rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm">
+          <Input value={med} onChangeText={setMed} label="🔗 Medicamento Identificado" />
+          <Input value={desc} onChangeText={setDesc} multiline label="📝 Síntomas Registrados" />
+          <Text className="mt-2 text-xs font-bold text-stone-400 uppercase">Intensidad</Text>
           <View className="flex-row space-x-2">
             {(['leve', 'molesto', 'fuerte'] as const).map(item => (
-              <Pressable key={item} onPress={() => setSev(item)} className={`flex-1 items-center rounded-xl p-3 ${sev === item ? 'bg-emerald-600' : 'bg-stone-100'}`}>
-                <Text className={`font-bold capitalize ${sev === item ? 'text-white' : 'text-stone-700'}`}>{item}</Text>
+              <Pressable key={item} onPress={() => setSev(item)} className={`flex-1 items-center rounded-xl p-3 ${sev === item ? 'bg-stone-900' : 'bg-stone-100'}`}>
+                <Text className={`text-xs font-bold capitalize ${sev === item ? 'text-white' : 'text-stone-700'}`}>{item}</Text>
               </Pressable>
             ))}
           </View>
         </View>
       </ScrollView>
-      <Pressable onPress={onSave} className="mt-4 items-center rounded-2xl bg-emerald-600 py-4 shadow-lg">
-        <Text className="text-base font-extrabold text-white">Guardar en Historial</Text>
+
+      <Pressable onPress={onSave} className="mt-4 items-center rounded-full bg-stone-900 py-4 shadow-md active:bg-black">
+        <Text className="text-base font-black text-white">➤ Confirmar y Guardar en Historial</Text>
       </Pressable>
     </View>
   );
 }
 
-function SesameCallInterface({ callState, timerSeconds, messages, isMuted, onStart, onEnd, onToggleMute }: any) {
+function SesamePhoneCallTabInterface({ callState, timerSeconds, messages, isMuted, isSpeaker, onStartCall, onEndCall, onToggleMute, onToggleSpeaker }: any) {
   const formatTimer = (sec: number) => `${Math.floor(sec / 60).toString().padStart(2, '0')}:${(sec % 60).toString().padStart(2, '0')}`;
 
+  let noteStatusText = 'Presiona abajo para llamar a aloRAM';
+  if (callState === 'ringing')
+    noteStatusText = 'Conectando con aloRAM...';
+  if (callState === 'connected')
+    noteStatusText = 'Escuchando la llamada...';
+
   return (
-    <View className="flex-1 justify-between p-6 pt-12">
-      <View className="items-center">
-        <Text className="text-xs font-bold tracking-widest text-emerald-300 uppercase">Sesame AI Voice Engine</Text>
-        <Text className="mt-1 text-3xl font-extrabold text-white">aloRAM</Text>
-        <Text className="mt-1 text-base text-emerald-200">{callState === 'idle' ? 'Toca para llamar' : callState === 'ringing' ? 'Conectando...' : formatTimer(timerSeconds)}</Text>
-      </View>
-
-      <View className="my-auto items-center">
-        <AloRAMAvatar size="xl" isCalling={callState === 'connected' || callState === 'ringing'} />
-      </View>
-
-      {callState !== 'idle' && (
-        <View className="h-44 rounded-3xl border border-emerald-800/50 bg-emerald-900/60 p-4">
-          <Text className="mb-2 text-xs font-bold text-emerald-300 uppercase">💬 Transcripción en vivo</Text>
-          <ScrollView className="flex-1">
-            {messages.map((msg: any, idx: number) => (
-              <View key={`msg-${idx}`} className={`mb-2.5 max-w-[85%] rounded-2xl p-3 ${msg.sender === 'aloRAM' ? 'self-start bg-emerald-800/80' : 'self-end bg-teal-700/80'}`}>
-                <Text className="text-xs font-bold text-emerald-200">{msg.sender}</Text>
-                <Text className="mt-0.5 text-sm font-medium text-white">{msg.text}</Text>
-              </View>
-            ))}
-          </ScrollView>
+    <View className="flex-1 justify-between bg-[#F5F2E9] p-4 pt-10">
+      <View className="items-center pt-2">
+        <View className="rounded-full border border-stone-200/60 bg-white/90 px-6 py-1.5 shadow-xs">
+          <Text className="text-sm font-bold text-stone-800">aloRAM</Text>
         </View>
-      )}
+      </View>
 
-      <View className="mt-6 items-center pb-6">
+      <View className="my-auto flex-1 justify-center px-2">
+        <View className="space-y-3 rounded-3xl border border-stone-200/70 bg-white p-6 shadow-xl">
+          <View className="flex-row items-center space-x-2 border-b border-stone-100 pb-3">
+            <Text className="text-base">📝</Text>
+            <Text className="text-xs font-bold tracking-wider text-stone-400 uppercase">Note</Text>
+          </View>
+
+          <Text className="text-2xl font-black text-stone-900">
+            Seguimiento de medicamentos
+          </Text>
+
+          <Text className="text-xs/relaxed text-stone-600">
+            Resumen en vivo de tu conversación por voz con aloRAM sobre tu tratamiento y bienestar.
+          </Text>
+
+          <View className="mt-3 space-y-2 border-t border-stone-100 pt-3">
+            {messages.length === 0
+              ? (
+                  <Text className="text-xs text-stone-400 italic">{noteStatusText}</Text>
+                )
+              : (
+                  messages.slice(-4).map((msg: any, idx: number) => (
+                    <View key={`m-${idx}`} className="flex-row items-start space-x-2">
+                      <Text className="text-xs font-bold text-stone-400">•</Text>
+                      <Text className="flex-1 text-xs font-medium text-stone-700">
+                        <Text className="font-bold text-stone-900">
+                          {msg.sender}
+                          :
+                          {' '}
+                        </Text>
+                        {msg.text}
+                      </Text>
+                    </View>
+                  ))
+                )}
+          </View>
+        </View>
+      </View>
+
+      <View className="pb-6">
         {callState === 'idle'
           ? (
-              <Pressable onPress={onStart} className="w-full items-center rounded-full bg-emerald-500 py-4 shadow-xl active:bg-emerald-600">
-                <Text className="text-lg font-extrabold text-emerald-950">📞 Hablar con aloRAM</Text>
+              <Pressable onPress={onStartCall} className="w-full flex-row items-center justify-center rounded-full bg-stone-900 py-4 shadow-xl active:bg-black">
+                <Text className="mr-2 text-xl">📞</Text>
+                <Text className="text-lg font-black text-white">Llamar a aloRAM</Text>
               </Pressable>
             )
           : (
-              <View className="w-full flex-row items-center justify-around">
-                <Pressable onPress={onToggleMute} className={`size-14 items-center justify-center rounded-full ${isMuted ? 'bg-amber-500' : 'bg-emerald-800'}`}>
-                  <Text className="text-xs font-bold text-white">{isMuted ? 'Mute' : 'Micro'}</Text>
+              <View className="flex-row items-center justify-between rounded-full border border-stone-300/40 bg-[#E8E4D9] p-2.5 shadow-md">
+                <Pressable onPress={onEndCall} className="flex-row items-center space-x-3 rounded-full bg-white px-4 py-2.5 shadow-xs active:bg-red-50">
+                  <View className="size-7 items-center justify-center rounded-full bg-red-100">
+                    <Text className="text-xs font-bold text-red-600">📞</Text>
+                  </View>
+                  <Text className="text-sm font-extrabold text-stone-800">{formatTimer(timerSeconds)}</Text>
                 </Pressable>
-                <Pressable onPress={onEnd} className="size-20 items-center justify-center rounded-full bg-red-600 shadow-xl">
-                  <Text className="text-base font-extrabold text-white">Colgar</Text>
-                </Pressable>
+
+                <View className="flex-row items-center space-x-2">
+                  <Pressable onPress={onToggleMute} className={`size-11 items-center justify-center rounded-full shadow-xs ${isMuted ? 'bg-amber-500' : 'bg-white'}`}>
+                    <Text className="text-base">{isMuted ? '🔇' : '🎙️'}</Text>
+                  </Pressable>
+
+                  <Pressable onPress={onToggleSpeaker} className={`size-11 items-center justify-center rounded-full shadow-xs ${isSpeaker ? 'bg-stone-900' : 'bg-white'}`}>
+                    <Text className={`text-base ${isSpeaker ? 'text-white' : 'text-stone-700'}`}>🔊</Text>
+                  </Pressable>
+                </View>
               </View>
             )}
       </View>
@@ -89,6 +128,7 @@ export function CallTabScreen() {
   const [callState, setCallState] = React.useState<'idle' | 'ringing' | 'connected' | 'summary'>('idle');
   const [timerSeconds, setTimerSeconds] = React.useState(0);
   const [isMuted, setIsMuted] = React.useState(false);
+  const [isSpeaker, setIsSpeaker] = React.useState(true);
   const [messages, setMessages] = React.useState<Array<{ sender: string; text: string }>>([]);
 
   const [summaryMed, setSummaryMed] = React.useState('');
@@ -99,11 +139,11 @@ export function CallTabScreen() {
     setCallState('ringing');
     setTimerSeconds(0);
     setMessages([]);
-    const sampleMed = medications[0]?.name ?? 'Losartán';
+    const sampleMed = medications[0]?.name ?? 'Paracetamol 500mg';
     setSummaryMed(sampleMed);
-    setSummaryDesc('Reporte conversacional con aloRAM');
+    setSummaryDesc('Consulta de adherencia y síntomas por voz');
 
-    startVapiCall(user.name || 'Amigo', medications, {
+    startVapiCall(user.name || 'Omar', medications, {
       onCallStart: () => setCallState('connected'),
       onCallEnd: () => setCallState('summary'),
       onTranscript: (text, sender) => {
@@ -116,8 +156,13 @@ export function CallTabScreen() {
 
     setTimeout(() => {
       setCallState('connected');
-      setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user.name || 'amigo'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?` }] : prev));
+      setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user.name || 'Omar'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?` }] : prev));
     }, 1500);
+  };
+
+  const handleSaveSummary = () => {
+    addReactionReport({ medicationName: summaryMed || 'Medicamento', description: summaryDesc || 'Llamada de voz aloRAM', onset: 'hoy', severity: summarySev, channel: 'voice' });
+    setCallState('idle');
   };
 
   const handleEndCall = () => {
@@ -131,11 +176,6 @@ export function CallTabScreen() {
     setVapiMuted(next);
   };
 
-  const handleSaveSummary = () => {
-    addReactionReport({ medicationName: summaryMed || 'Medicamento', description: summaryDesc || 'Reporte por voz Vapi AI', onset: 'hoy', severity: summarySev, channel: 'voice' });
-    setCallState('idle');
-  };
-
   React.useEffect(() => {
     if (callState !== 'connected')
       return;
@@ -144,14 +184,14 @@ export function CallTabScreen() {
   }, [callState]);
 
   return (
-    <View className="flex-1 bg-emerald-950">
+    <View className="flex-1 bg-[#F5F2E9]">
       <FocusAwareStatusBar />
       {callState === 'summary'
         ? (
-            <CallSummaryView med={summaryMed} setMed={setSummaryMed} desc={summaryDesc} setDesc={setSummaryDesc} sev={summarySev} setSev={setSummarySev} onSave={handleSaveSummary} />
+            <SummaryCardView med={summaryMed} setMed={setSummaryMed} desc={summaryDesc} setDesc={setSummaryDesc} sev={summarySev} setSev={setSummarySev} onSave={handleSaveSummary} />
           )
         : (
-            <SesameCallInterface callState={callState} timerSeconds={timerSeconds} messages={messages} isMuted={isMuted} onStart={handleStartCall} onEnd={handleEndCall} onToggleMute={handleToggleMute} />
+            <SesamePhoneCallTabInterface callState={callState} timerSeconds={timerSeconds} messages={messages} isMuted={isMuted} isSpeaker={isSpeaker} onStartCall={handleStartCall} onEndCall={handleEndCall} onToggleMute={handleToggleMute} onToggleSpeaker={() => setIsSpeaker(!isSpeaker)} />
           )}
     </View>
   );

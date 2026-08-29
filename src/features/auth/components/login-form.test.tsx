@@ -19,29 +19,27 @@ describe('loginForm Form ', () => {
     const { user } = setup(<LoginForm />);
 
     const button = screen.getByTestId('login-button');
-    expect(screen.queryByText(/El DNI o correo electrónico es requerido/i)).not.toBeOnTheScreen();
     await user.press(button);
-    expect(await screen.findByText(/El DNI o correo electrónico es requerido/i)).toBeOnTheScreen();
-    expect(screen.getByText(/La contraseña es requerida/i)).toBeOnTheScreen();
+    expect(await screen.findByText(/El número de teléfono es requerido/i)).toBeOnTheScreen();
   });
 
   it('should call LoginForm with correct values when values are valid', async () => {
     const { user } = setup(<LoginForm onSubmit={onSubmitMock} />);
 
     const button = screen.getByTestId('login-button');
-    const input = screen.getByTestId('dni-email-input');
+    const input = screen.getByTestId('phone-input');
     const passwordInput = screen.getByTestId('password-input');
 
-    await user.type(input, '72849102');
-    await user.type(passwordInput, '123456');
+    await user.type(input, '987654321');
+    await user.type(passwordInput, 'test');
     await user.press(button);
     await waitFor(() => {
       expect(onSubmitMock).toHaveBeenCalledTimes(1);
     });
     expect(onSubmitMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        dniOrEmail: '72849102',
-        password: '123456',
+        phone: '987654321',
+        password: 'test',
       }),
     );
   });

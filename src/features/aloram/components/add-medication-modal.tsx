@@ -9,35 +9,43 @@ type Props = {
 };
 
 const MEDICATION_SUGGESTIONS = [
-  'Paracetamol',
-  'Losartán',
-  'Omeprazol',
-  'Amoxicilina',
-  'Metformina',
-  'Ibuprofeno',
-  'Aspirina',
-  'Atorvastatina',
+  'Paracetamol 500mg',
+  'Losartán 50mg',
+  'Omeprazol 20mg',
+  'Amoxicilina 500mg',
+  'Metformina 850mg',
+  'Ibuprofeno 400mg',
+  'Atorvastatina 20mg',
+];
+
+const DOSE_SUGGESTIONS = [
+  '500mg (1 pastilla)',
+  '50mg (1 pastilla)',
+  '20mg (1 cápsula)',
+  '100mg',
+  '1 tableta',
+  '2 pastillas',
 ];
 
 const FREQUENCY_OPTIONS = [
-  '1 vez al día',
+  '1 vez al día (cada 24h)',
   '2 veces al día (cada 12h)',
   '3 veces al día (cada 8h)',
-  'Solo cuando tengo dolor',
+  'Solo cuando sea necesario',
 ];
 
 function StepName({ name, setName }: { name: string; setName: (v: string) => void }) {
   return (
     <View className="my-auto space-y-4">
-      <Text className="text-2xl font-extrabold text-stone-800 dark:text-stone-100">
+      <Text className="text-2xl font-extrabold text-slate-900 dark:text-stone-100">
         1. ¿Qué medicamento estás tomando?
       </Text>
-      <Input placeholder="Ej. Paracetamol o Losartán" value={name} onChangeText={setName} autoFocus />
-      <Text className="mt-2 text-xs font-semibold text-stone-400">Sugerencias rápidas:</Text>
+      <Input placeholder="Ej. Paracetamol 500mg" value={name} onChangeText={setName} autoFocus />
+      <Text className="mt-2 text-xs font-bold text-slate-400 uppercase">Sugerencias habituales:</Text>
       <View className="flex-row flex-wrap gap-2 pt-1">
-        {MEDICATION_SUGGESTIONS.slice(0, 6).map(sugg => (
-          <Pressable key={sugg} onPress={() => setName(sugg)} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 dark:bg-emerald-950">
-            <Text className="text-xs font-medium text-emerald-800 dark:text-emerald-300">
+        {MEDICATION_SUGGESTIONS.map(sugg => (
+          <Pressable key={sugg} onPress={() => setName(sugg)} className="rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 dark:bg-blue-950">
+            <Text className="text-xs font-bold text-blue-700 dark:text-blue-300">
               +
               {sugg}
             </Text>
@@ -76,27 +84,35 @@ function StepDetails({
   if (step === 2) {
     return (
       <View className="my-auto space-y-4">
-        <Text className="text-2xl font-extrabold text-stone-800 dark:text-stone-100">2. ¿Para qué te lo recetaron?</Text>
-        <Input placeholder="Ej. Presión alta" value={reason} onChangeText={setReason} autoFocus />
+        <Text className="text-2xl font-extrabold text-slate-900 dark:text-stone-100">2. ¿Para qué te lo recetaron?</Text>
+        <Input placeholder="Ej. Dolor o presión alta" value={reason} onChangeText={setReason} autoFocus />
       </View>
     );
   }
   if (step === 3) {
     return (
       <View className="my-auto space-y-4">
-        <Text className="text-2xl font-extrabold text-stone-800 dark:text-stone-100">3. ¿Cuánto tomas cada vez? (Dosis)</Text>
-        <Input placeholder="Ej. 1 pastilla, 500mg" value={dose} onChangeText={setDose} autoFocus />
+        <Text className="text-2xl font-extrabold text-slate-900 dark:text-stone-100">3. Dosis (ej. 500mg)</Text>
+        <Input placeholder="Ej. 500mg o 1 pastilla" value={dose} onChangeText={setDose} autoFocus />
+        <Text className="mt-2 text-xs font-bold text-slate-400 uppercase">Dosis comunes:</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {DOSE_SUGGESTIONS.map(d => (
+            <Pressable key={d} onPress={() => setDose(d)} className="rounded-full border border-slate-300 bg-slate-100 px-3.5 py-1.5">
+              <Text className="text-xs font-semibold text-slate-700">{d}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
     );
   }
   if (step === 4) {
     return (
       <View className="my-auto space-y-4">
-        <Text className="text-2xl font-extrabold text-stone-800 dark:text-stone-100">4. ¿Cuántas veces al día?</Text>
+        <Text className="text-2xl font-extrabold text-slate-900 dark:text-stone-100">4. ¿Frecuencia de toma?</Text>
         <ScrollView className="max-h-60 space-y-2">
           {FREQUENCY_OPTIONS.map(opt => (
-            <Pressable key={opt} onPress={() => setFrequency(opt)} className={`rounded-2xl border p-4 ${frequency === opt ? 'border-emerald-600 bg-emerald-50' : 'border-stone-200 bg-white'}`}>
-              <Text className="font-semibold text-stone-800">{opt}</Text>
+            <Pressable key={opt} onPress={() => setFrequency(opt)} className={`rounded-2xl border p-4 ${frequency === opt ? 'border-blue-600 bg-blue-50' : 'border-slate-200 bg-white'}`}>
+              <Text className="font-bold text-slate-800">{opt}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -106,7 +122,7 @@ function StepDetails({
   if (step === 5) {
     return (
       <View className="my-auto space-y-4">
-        <Text className="text-2xl font-extrabold text-stone-800 dark:text-stone-100">5. ¿A qué hora sueles tomarlo?</Text>
+        <Text className="text-2xl font-extrabold text-slate-900 dark:text-stone-100">5. ¿A qué hora sueles tomarlo?</Text>
         <Input placeholder="Ej. 08:00 AM" value={time} onChangeText={setTime} />
       </View>
     );
@@ -114,45 +130,31 @@ function StepDetails({
   if (step === 6) {
     return (
       <View className="my-auto space-y-4">
-        <Text className="text-2xl font-extrabold text-stone-800 dark:text-stone-100">6. ¿Desde cuándo lo estás tomando?</Text>
-        <Input placeholder="Ej. Hoy" value={startDate} onChangeText={setStartDate} />
+        <Text className="text-2xl font-extrabold text-slate-900 dark:text-stone-100">6. ¿Desde cuándo lo estás tomando?</Text>
+        <Input placeholder="Ej. Hoy o Desde hace 3 días" value={startDate} onChangeText={setStartDate} />
       </View>
     );
   }
   return null;
 }
 
-function StepSummary({
-  name,
-  reason,
-  dose,
-  frequency,
-  time,
-  startDate,
-}: {
-  name: string;
-  reason: string;
-  dose: string;
-  frequency: string;
-  time: string;
-  startDate: string;
-}) {
+function StepSummary({ name, reason, dose, frequency, time, startDate }: any) {
   return (
-    <ScrollView className="my-auto">
-      <Text className="mb-2 text-2xl font-extrabold text-stone-800 dark:text-stone-100">7. Confirmar Medicamento</Text>
-      <View className="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-5 dark:bg-emerald-950/40">
-        <Text className="text-xs font-bold text-emerald-700 uppercase">Resumen del tratamiento</Text>
-        <Text className="mt-2 text-2xl font-bold text-stone-900">{name || 'Medicamento'}</Text>
-        <View className="mt-4 space-y-2 border-t border-emerald-200/60 pt-3">
-          <Text className="text-sm text-stone-700">
+    <ScrollView className="my-auto space-y-3">
+      <Text className="text-2xl font-black text-slate-900 dark:text-stone-100">7. Confirmar Medicamento</Text>
+      <View className="rounded-3xl border border-blue-200 bg-blue-50 p-5 shadow-xs">
+        <Text className="text-xs font-bold text-blue-700 uppercase">Resumen de receta</Text>
+        <Text className="mt-1 text-2xl font-extrabold text-slate-900">{name || 'Medicamento'}</Text>
+        <View className="mt-4 space-y-2 border-t border-blue-200/60 pt-3">
+          <Text className="text-sm font-medium text-slate-700">
             🎯 Motivo:
             {reason || 'General'}
           </Text>
-          <Text className="text-sm text-stone-700">
+          <Text className="text-sm font-medium text-slate-700">
             💊 Dosis:
-            {dose || '1 toma'}
+            {dose || '500mg'}
           </Text>
-          <Text className="text-sm text-stone-700">
+          <Text className="text-sm font-medium text-slate-700">
             ⏰ Frecuencia:
             {frequency || 'Diario'}
             {' '}
@@ -160,7 +162,7 @@ function StepSummary({
             {time}
             )
           </Text>
-          <Text className="text-sm text-stone-700">
+          <Text className="text-sm font-medium text-slate-700">
             📅 Inicio:
             {startDate}
           </Text>
@@ -186,9 +188,9 @@ export function AddMedicationModal({ visible, onClose }: Props) {
 
   const handleConfirm = () => {
     addMedication({
-      name: name || 'Medicamento',
+      name: name || 'Paracetamol 500mg',
       reason: reason || 'Tratamiento personal',
-      dose: dose || '1 toma',
+      dose: dose || '500mg',
       frequency: frequency || '1 vez al día',
       times: [time],
       startDate,
@@ -200,22 +202,22 @@ export function AddMedicationModal({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
-      <SafeAreaView className="flex-1 bg-stone-50 dark:bg-stone-900">
+      <SafeAreaView className="flex-1 bg-slate-50 dark:bg-stone-900">
         <View className="flex-1 justify-between p-5">
           <View>
             <View className="flex-row items-center justify-between">
               <Pressable onPress={step === 1 ? onClose : handleBack} className="p-2">
-                <Text className="text-sm font-semibold text-emerald-700">{step === 1 ? 'Cancelar' : '← Volver'}</Text>
+                <Text className="text-sm font-bold text-blue-600">{step === 1 ? 'Cancelar' : '← Volver'}</Text>
               </Pressable>
-              <Text className="text-xs font-bold text-stone-400">
+              <Text className="text-xs font-bold text-slate-400">
                 Paso
                 {step}
                 {' '}
                 de 7
               </Text>
             </View>
-            <View className="mt-2 h-2 w-full rounded-full bg-stone-200">
-              <View className="h-full rounded-full bg-emerald-600" style={{ width: `${(step / 7) * 100}%` }} />
+            <View className="mt-2 h-2 w-full rounded-full bg-slate-200">
+              <View className="h-full rounded-full bg-blue-600" style={{ width: `${(step / 7) * 100}%` }} />
             </View>
           </View>
 
@@ -240,7 +242,13 @@ export function AddMedicationModal({ visible, onClose }: Props) {
           )}
 
           <View className="mt-4 pt-3">
-            {step < 7 ? <Button label="Siguiente →" onPress={handleNext} /> : <Button label="Guardar Medicamento" onPress={handleConfirm} />}
+            {step < 7
+              ? (
+                  <Button label="Siguiente →" onPress={handleNext} className="bg-blue-600" />
+                )
+              : (
+                  <Button label="Guardar Medicamento" onPress={handleConfirm} className="bg-blue-600" />
+                )}
           </View>
         </View>
       </SafeAreaView>

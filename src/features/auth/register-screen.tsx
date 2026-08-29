@@ -13,13 +13,13 @@ export function RegisterScreen() {
   const onSubmit: RegisterFormProps['onSubmit'] = (data) => {
     signUp(
       {
-        dni: data.dni,
+        dni: '72849102',
         name: data.name,
-        email: data.email,
+        email: 'usuario@aloram.app',
       },
       {
-        access: 'vacunacare-access-token',
-        refresh: 'vacunacare-refresh-token',
+        access: 'aloram-access-token',
+        refresh: 'aloram-refresh-token',
       },
     );
     router.replace('/');

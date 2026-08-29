@@ -10,13 +10,12 @@ export function LoginScreen() {
   const router = useRouter();
   const signIn = useAuthStore.use.signIn();
 
-  const onSubmit: LoginFormProps['onSubmit'] = (data) => {
-    const isDni = /^\d+$/.test(data.dniOrEmail);
+  const onSubmit: LoginFormProps['onSubmit'] = (_data) => {
     signIn(
-      { access: 'vacunacare-access-token', refresh: 'vacunacare-refresh-token' },
+      { access: 'aloram-access-token', refresh: 'aloram-refresh-token' },
       {
-        dni: isDni ? data.dniOrEmail : '72849102',
-        email: !isDni ? data.dniOrEmail : 'usuario@vacunacare.org',
+        dni: '72849102',
+        email: 'usuario@aloram.app',
         name: 'Usuario Registrado',
       },
     );

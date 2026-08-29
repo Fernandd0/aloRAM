@@ -8,17 +8,16 @@ import { Button, Input, Pressable, Text, View } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 
 const schema = z.object({
-  dniOrEmail: z
+  phone: z
     .string({
-      message: 'El DNI o correo electrónico es requerido',
+      message: 'El número de teléfono es requerido',
     })
-    .min(1, 'El DNI o correo electrónico es requerido'),
+    .min(1, 'El número de teléfono es requerido'),
   password: z
     .string({
       message: 'La contraseña es requerida',
     })
-    .min(1, 'La contraseña es requerida')
-    .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    .min(1, 'La contraseña es requerida'),
 });
 
 export type FormType = z.infer<typeof schema>;
@@ -31,7 +30,7 @@ export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
   const router = useRouter();
   const form = useForm({
     defaultValues: {
-      dniOrEmail: '',
+      phone: '',
       password: '',
     },
     validators: {
@@ -48,67 +47,74 @@ export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
       behavior="padding"
       keyboardVerticalOffset={10}
     >
-      <View className="flex-1 justify-center p-4">
-        <View className="items-center justify-center">
+      <View className="flex-1 justify-center bg-slate-50 p-6 dark:bg-stone-900">
+        <View className="mb-8 items-center justify-center">
+          <View className="mb-3 size-16 items-center justify-center rounded-3xl bg-blue-600 shadow-md">
+            <Text className="text-2xl">💊</Text>
+          </View>
           <Text
             testID="form-title"
-            className="pb-2 text-center text-3xl font-bold text-primary-700"
+            className="pb-1 text-center text-3xl font-black text-blue-900 dark:text-white"
           >
-            VacunaCare
+            aloRAM
           </Text>
-          <Text className="mb-6 max-w-xs text-center text-gray-500">
-            ¡Bienvenido! Ingresa con tu DNI o correo registrado para acceder a tu historial de vacunas.
+          <Text className="max-w-xs text-center text-xs font-medium text-slate-500">
+            Ingresa tu número de teléfono y contraseña para acceder a tus medicamentos y reportes de salud por voz.
           </Text>
         </View>
 
-        <form.Field
-          name="dniOrEmail"
-          children={field => (
-            <Input
-              testID="dni-email-input"
-              label="DNI o Correo Electrónico"
-              placeholder="Ej. 72849102 o correo@ejemplo.com"
-              autoCapitalize="none"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChangeText={field.handleChange}
-              error={getFieldError(field)}
-            />
-          )}
-        />
+        <View className="space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:bg-stone-800">
+          <form.Field
+            name="phone"
+            children={field => (
+              <Input
+                testID="phone-input"
+                label="Número de Teléfono"
+                placeholder="Ej. 987654321"
+                autoCapitalize="none"
+                keyboardType="phone-pad"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChangeText={field.handleChange}
+                error={getFieldError(field)}
+              />
+            )}
+          />
 
-        <form.Field
-          name="password"
-          children={field => (
-            <Input
-              testID="password-input"
-              label="Contraseña"
-              placeholder="******"
-              secureTextEntry={true}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChangeText={field.handleChange}
-              error={getFieldError(field)}
-            />
-          )}
-        />
+          <form.Field
+            name="password"
+            children={field => (
+              <Input
+                testID="password-input"
+                label="Contraseña"
+                placeholder="******"
+                secureTextEntry={true}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChangeText={field.handleChange}
+                error={getFieldError(field)}
+              />
+            )}
+          />
 
-        <form.Subscribe
-          selector={state => [state.isSubmitting]}
-          children={([isSubmitting]) => (
-            <Button
-              testID="login-button"
-              label="Iniciar Sesión"
-              onPress={form.handleSubmit}
-              loading={isSubmitting}
-            />
-          )}
-        />
+          <form.Subscribe
+            selector={state => [state.isSubmitting]}
+            children={([isSubmitting]) => (
+              <Button
+                testID="login-button"
+                label="Iniciar Sesión"
+                onPress={form.handleSubmit}
+                loading={isSubmitting}
+                className="mt-2 rounded-2xl bg-blue-600 py-3.5"
+              />
+            )}
+          />
+        </View>
 
-        <View className="mt-6 flex-row justify-center">
-          <Text className="text-gray-600">¿No tienes cuenta? </Text>
+        <View className="mt-6 flex-row items-center justify-center">
+          <Text className="text-xs text-slate-500">¿Aún no tienes cuenta? </Text>
           <Pressable onPress={() => router.push('/register')}>
-            <Text className="font-bold text-primary-600">Regístrate con DNI</Text>
+            <Text className="text-xs font-bold text-blue-600">Regístrate gratis</Text>
           </Pressable>
         </View>
       </View>

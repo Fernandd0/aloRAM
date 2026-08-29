@@ -1,7 +1,7 @@
 import Vapi from '@vapi-ai/web';
 
 const VAPI_PUBLIC_KEY = process.env.EXPO_PUBLIC_VAPI_API_KEY || '60639c9c-4ee0-4b4e-a801-487122d8f68b';
-const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID;
+const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3842d719-98ab-4b75-92aa-f2f911c09d35';
 
 let vapiInstance: Vapi | null = null;
 
