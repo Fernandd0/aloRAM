@@ -24,14 +24,15 @@ export type FormType = z.infer<typeof schema>;
 
 export type LoginFormProps = {
   onSubmit?: (data: FormType) => void;
+  defaultValues?: Partial<FormType>;
 };
 
-export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
+export function LoginForm({ onSubmit = () => {}, defaultValues }: LoginFormProps) {
   const router = useRouter();
   const form = useForm({
     defaultValues: {
-      phone: '',
-      password: '',
+      phone: defaultValues?.phone ?? '',
+      password: defaultValues?.password ?? '',
     },
     validators: {
       onChange: schema as any,

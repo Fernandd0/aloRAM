@@ -34,7 +34,7 @@ export function HomeScreen() {
   const user = useAloRAMStore.use.user();
   const medications = useAloRAMStore.use.medications();
   const reactions = useAloRAMStore.use.reactionReports();
-  const activeMeds = medications.filter(m => m.status === 'active');
+  const activeMeds = (medications || []).filter(m => m.status === 'active');
 
   const [showCallModal, setShowCallModal] = React.useState(false);
   const [showAddMedModal, setShowAddMedModal] = React.useState(false);
@@ -50,7 +50,7 @@ export function HomeScreen() {
             <Text className="text-xs font-bold text-blue-600 uppercase">aloRAM Reporte</Text>
             <Text className="text-xl font-extrabold text-slate-900 dark:text-white">
               Hola,
-              {user.name || 'Usuario'}
+              {user?.name || 'Usuario'}
             </Text>
           </View>
         </View>
@@ -67,7 +67,7 @@ export function HomeScreen() {
           <Text className="text-xs text-slate-400">Resumen actualizado</Text>
           <View className="mt-3 flex-row space-x-3">
             <View className="flex-1 items-center rounded-2xl border border-blue-100 bg-blue-50 p-4">
-              <Text className="text-2xl font-black text-blue-700">{reactions.length}</Text>
+              <Text className="text-2xl font-black text-blue-700">{(reactions || []).length}</Text>
               <Text className="mt-1 text-xs font-bold text-blue-600">En Revisión</Text>
             </View>
             <View className="flex-1 items-center rounded-2xl border border-emerald-200 bg-emerald-100 p-4">

@@ -151,11 +151,11 @@ export function CallTabScreen() {
     setTimerSeconds(0);
     setMessages([]);
     setCallError(null);
-    const sampleMed = medications[0]?.name ?? 'Paracetamol 500mg';
+    const sampleMed = (medications || [])[0]?.name ?? 'Paracetamol 500mg';
     setSummaryMed(sampleMed);
     setSummaryDesc('Consulta de adherencia y síntomas por voz');
 
-    startVapiCall(user.name || 'Omar', medications, {
+    startVapiCall(user?.name || 'Omar', medications || [], {
       onCallStart: () => {
         setCallState('connected');
         setCallError(null);
@@ -165,7 +165,7 @@ export function CallTabScreen() {
       },
       onTranscript: (text, sender) => {
         setMessages(prev => [...prev, { sender, text }]);
-        if (text.length > 5 && sender === user.name)
+        if (text.length > 5 && sender === (user?.name || 'Omar'))
           setSummaryDesc(text);
       },
       onError: (err) => {
@@ -176,7 +176,7 @@ export function CallTabScreen() {
 
     setTimeout(() => {
       setCallState(prev => (prev === 'ringing' ? 'connected' : prev));
-      setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user.name || 'Omar'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?` }] : prev));
+      setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user?.name || 'Omar'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?` }] : prev));
     }, 2000);
   };
 

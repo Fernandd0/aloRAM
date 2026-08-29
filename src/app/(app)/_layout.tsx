@@ -12,7 +12,7 @@ import { useAuthStore as useAuth } from '@/features/auth/use-auth-store';
 export default function TabLayout() {
   const status = useAuth.use.status();
 
-  if (status === 'signOut') {
+  if (status !== 'signIn') {
     return <Redirect href="/login" />;
   }
   return (

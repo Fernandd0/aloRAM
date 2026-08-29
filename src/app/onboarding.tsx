@@ -1,1 +1,5 @@
-export { OnboardingScreen as default } from '@/features/onboarding/onboarding-screen';
+import { Redirect } from 'expo-router';
+
+export default function OnboardingScreen() {
+  return <Redirect href="/login" />;
+}

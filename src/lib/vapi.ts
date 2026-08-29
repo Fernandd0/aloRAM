@@ -1,7 +1,6 @@
-import 'react-native-get-random-values';
-import { Platform } from 'react-native';
 import VapiWeb from '@vapi-ai/web';
-import VapiNative from '@vapi-ai/react-native';
+import { Platform } from 'react-native';
+import 'react-native-get-random-values';
 
 const VAPI_PUBLIC_KEY = process.env.EXPO_PUBLIC_VAPI_API_KEY || '60639c9c-4ee0-4b4e-a801-487122d8f68b';
 export const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3842d719-98ab-4b75-92aa-f2f911c09d35';
@@ -10,8 +9,32 @@ let vapiInstance: any = null;
 
 export function getVapiInstance(): any {
   if (!vapiInstance) {
-    const VapiSDK = Platform.OS === 'web' ? VapiWeb : VapiNative;
-    vapiInstance = new VapiSDK(VAPI_PUBLIC_KEY);
+    try {
+      let VapiSDK: any = VapiWeb;
+      if (Platform.OS !== 'web') {
+        try {
+          const nativeModule = require('@vapi-ai/react-native');
+          VapiSDK = nativeModule?.default || nativeModule || VapiWeb;
+        }
+        catch (e) {
+          console.warn('VapiNative require failed, falling back to VapiWeb:', e);
+          VapiSDK = VapiWeb;
+        }
+      }
+      vapiInstance = new VapiSDK(VAPI_PUBLIC_KEY);
+    }
+    catch (e) {
+      console.warn('Vapi SDK init failed, using fallback mock:', e);
+      vapiInstance = {
+        on: () => {},
+        removeAllListeners: () => {},
+        start: async () => {
+          throw new Error('SDK de voz no compatible en este cliente. Usa Expo Development Build o Web.');
+        },
+        stop: () => {},
+        setMuted: () => {},
+      };
+    }
   }
   return vapiInstance;
 }
