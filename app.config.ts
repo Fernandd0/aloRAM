@@ -8,11 +8,11 @@ import 'tsx/cjs';
 // eslint-disable-next-line perfectionist/sort-imports
 import Env from './env';
 
-const EXPO_ACCOUNT_OWNER = 'aloram';
-const EAS_PROJECT_ID = 'c3e1075b-6fe7-4686-aa49-35b46a229044';
+const EXPO_ACCOUNT_OWNER = 'fernaddoo';
+const EAS_PROJECT_ID = 'b0bcefcd-a1a9-4221-9e79-d684e8675e35';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
-  enabled: Env.EXPO_PUBLIC_APP_ENV !== 'production',
+  enabled: Env.EXPO_PUBLIC_APP_ENV !== 'production' && process.env.EAS_BUILD !== 'true',
   badges: [
     {
       text: Env.EXPO_PUBLIC_APP_ENV,
@@ -38,8 +38,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
-  newArchEnabled: true,
+  runtimeVersion: {
+    policy: 'appVersion',
+  },
   updates: {
+    url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
     fallbackToCacheTimeout: 0,
   },
   assetBundlePatterns: ['**/*'],

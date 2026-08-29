@@ -3,19 +3,15 @@ import * as React from 'react';
 
 import {
   Feed as FeedIcon,
+  PhoneIcon,
   Settings as SettingsIcon,
   Style as StyleIcon,
 } from '@/components/ui/icons';
 import { useAuthStore as useAuth } from '@/features/auth/use-auth-store';
-import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
 
 export default function TabLayout() {
   const status = useAuth.use.status();
-  const [isFirstTime] = useIsFirstTime();
 
-  if (isFirstTime) {
-    return <Redirect href="/onboarding" />;
-  }
   if (status === 'signOut') {
     return <Redirect href="/login" />;
   }
@@ -35,7 +31,7 @@ export default function TabLayout() {
         options={{
           title: 'Llamar',
           headerShown: false,
-          tabBarIcon: ({ color }) => <FeedIcon color={color} />,
+          tabBarIcon: ({ color }) => <PhoneIcon color={color} size={24} />,
           tabBarButtonTestID: 'call-tab',
         }}
       />

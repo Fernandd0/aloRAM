@@ -1,13 +1,17 @@
-import Vapi from '@vapi-ai/web';
+import 'react-native-get-random-values';
+import { Platform } from 'react-native';
+import VapiWeb from '@vapi-ai/web';
+import VapiNative from '@vapi-ai/react-native';
 
 const VAPI_PUBLIC_KEY = process.env.EXPO_PUBLIC_VAPI_API_KEY || '60639c9c-4ee0-4b4e-a801-487122d8f68b';
-const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3842d719-98ab-4b75-92aa-f2f911c09d35';
+export const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3842d719-98ab-4b75-92aa-f2f911c09d35';
 
-let vapiInstance: Vapi | null = null;
+let vapiInstance: any = null;
 
-export function getVapiInstance(): Vapi {
+export function getVapiInstance(): any {
   if (!vapiInstance) {
-    vapiInstance = new Vapi(VAPI_PUBLIC_KEY);
+    const VapiSDK = Platform.OS === 'web' ? VapiWeb : VapiNative;
+    vapiInstance = new VapiSDK(VAPI_PUBLIC_KEY);
   }
   return vapiInstance;
 }
@@ -23,27 +27,48 @@ export type VapiCallbacks = {
 
 export async function startVapiCall(
   userName: string,
-  medications: Array<{ name: string; dose: string; reason: string }>,
+  medications: Array<{ name: string; dose?: string; reason?: string }>,
   callbacks: VapiCallbacks = {},
 ) {
   const vapi = getVapiInstance();
 
   // Clear previous listeners
-  vapi.removeAllListeners();
+  try {
+    vapi.removeAllListeners();
+  }
+  catch (e) {
+    console.warn('Vapi removeAllListeners warning:', e);
+  }
 
-  if (callbacks.onCallStart)
-    vapi.on('call-start', callbacks.onCallStart);
-  if (callbacks.onCallEnd)
-    vapi.on('call-end', callbacks.onCallEnd);
-  if (callbacks.onSpeechStart)
-    vapi.on('speech-start', callbacks.onSpeechStart);
-  if (callbacks.onSpeechEnd)
-    vapi.on('speech-end', callbacks.onSpeechEnd);
-  if (callbacks.onError)
-    vapi.on('error', callbacks.onError);
+  if (callbacks.onCallStart) {
+    vapi.on('call-start', () => {
+      callbacks.onCallStart?.();
+    });
+  }
+  if (callbacks.onCallEnd) {
+    vapi.on('call-end', () => {
+      callbacks.onCallEnd?.();
+    });
+  }
+  if (callbacks.onSpeechStart) {
+    vapi.on('speech-start', () => {
+      callbacks.onSpeechStart?.();
+    });
+  }
+  if (callbacks.onSpeechEnd) {
+    vapi.on('speech-end', () => {
+      callbacks.onSpeechEnd?.();
+    });
+  }
+  if (callbacks.onError) {
+    vapi.on('error', (error: any) => {
+      console.error('Vapi Web SDK error event:', error);
+      callbacks.onError?.(error);
+    });
+  }
 
   vapi.on('message', (message: any) => {
-    if (message.type === 'transcript') {
+    if (message.type === 'transcript' || message.type === 'transcript[final]') {
       const text = message.transcript;
       const role = message.role === 'assistant' ? 'aloRAM' : userName || 'Tú';
       if (text && callbacks.onTranscript) {
@@ -52,19 +77,18 @@ export async function startVapiCall(
     }
   });
 
-  const medSummary = medications.map(m => `${m.name} (${m.dose} para ${m.reason})`).join(', ');
-
-  const systemPrompt = `Eres aloRAM, un asistente médico personal y amigo amigable, cálido y empático en español latino. 
-Hablas directamente con ${userName || 'tu paciente'} para saber cómo se siente hoy con sus medicamentos: ${medSummary || 'sus remedios'}.
-Habla con frases cortas, naturales y humanas. Haz una sola pregunta a la vez. Pregúntale si sintió algún mareo, dolor u otra molestia.`;
+  const medSummary = medications.map(m => `${m.name}${m.dose ? ` (${m.dose})` : ''}`).join(', ');
 
   try {
-    // Check if user configured an Assistant ID in Vapi Dashboard
     if (VAPI_ASSISTANT_ID) {
-      await vapi.start(VAPI_ASSISTANT_ID);
+      await vapi.start(VAPI_ASSISTANT_ID, {
+        variableValues: {
+          userName: userName || 'Amigo',
+          medications: medSummary || 'medicamentos habituales',
+        },
+      });
     }
     else {
-      // Fallback: Start with inline assistant payload
       await vapi.start({
         model: {
           provider: 'openai',
@@ -72,21 +96,18 @@ Habla con frases cortas, naturales y humanas. Haz una sola pregunta a la vez. Pr
           messages: [
             {
               role: 'system',
-              content: systemPrompt,
+              content: `Eres aloRAM, un asistente médico de voz en español para ${userName || 'el paciente'}.`,
             },
           ],
-        },
-        voice: {
-          provider: 'playht',
-          voiceId: 's3://voice-cloning-zero-shot/d9207869-7c85-48b2-a400-d86c75c8793f/original/manifest.json', // Standard fallback voice
         },
       });
     }
   }
   catch (error: any) {
-    console.warn('Vapi start error:', error);
-    if (callbacks.onError)
+    console.error('Vapi start error:', error);
+    if (callbacks.onError) {
       callbacks.onError(error);
+    }
   }
 }
 
@@ -104,10 +125,12 @@ export function stopVapiCall() {
 export function setVapiMuted(isMuted: boolean) {
   if (vapiInstance) {
     try {
-      vapiInstance.setMuted(isMuted);
+      if (typeof vapiInstance.setMuted === 'function') {
+        vapiInstance.setMuted(isMuted);
+      }
     }
     catch (e) {
-      console.error('Error setting Vapi mute:', e);
+      console.warn('Vapi mute warning:', e);
     }
   }
 }

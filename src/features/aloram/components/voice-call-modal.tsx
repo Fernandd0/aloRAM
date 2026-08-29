@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Modal, SafeAreaView } from 'react-native';
 import { Button, Input, Pressable, ScrollView, Text, View } from '@/components/ui';
+import { PhoneIcon } from '@/components/ui/icons';
 import { setVapiMuted, startVapiCall, stopVapiCall } from '@/lib/vapi';
 import { useAloRAMStore } from '../store/use-aloram-store';
 
@@ -50,7 +51,7 @@ function IASummaryReportView({ medication, setMedication, description, setDescri
   );
 }
 
-function SesamePhoneCallScreen({ timerSeconds, isRinging, messages, isMuted, isSpeaker, onToggleMute, onToggleSpeaker, onEndCall }: any) {
+function SesamePhoneCallScreen({ timerSeconds, isRinging, messages, isMuted, isSpeaker, callError, onToggleMute, onToggleSpeaker, onEndCall }: any) {
   const formatTimer = (sec: number) => `${Math.floor(sec / 60).toString().padStart(2, '0')}:${(sec % 60).toString().padStart(2, '0')}`;
 
   return (
@@ -64,6 +65,13 @@ function SesamePhoneCallScreen({ timerSeconds, isRinging, messages, isMuted, isS
 
       {/* Main Sesame AI Live Note Card */}
       <View className="my-auto flex-1 justify-center px-4">
+        {callError && (
+          <View className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <Text className="text-xs font-bold text-amber-800">⚠️ Aviso de Conexión</Text>
+            <Text className="mt-1 text-xs text-amber-700">{callError}</Text>
+          </View>
+        )}
+
         <View className="space-y-3 rounded-3xl border border-stone-200/70 bg-white p-6 shadow-xl">
           <View className="flex-row items-center space-x-2 border-b border-stone-100 pb-3">
             <Text className="text-base">📝</Text>
@@ -108,7 +116,7 @@ function SesamePhoneCallScreen({ timerSeconds, isRinging, messages, isMuted, isS
           {/* Left Pill: Red Hangup Icon + Timer */}
           <Pressable onPress={onEndCall} className="flex-row items-center space-x-3 rounded-full bg-white px-4 py-2.5 shadow-xs active:bg-red-50">
             <View className="size-7 items-center justify-center rounded-full bg-red-100">
-              <Text className="text-xs font-bold text-red-600">📞</Text>
+              <PhoneIcon color="#dc2626" size={16} />
             </View>
             <Text className="text-sm font-extrabold text-stone-800">{formatTimer(timerSeconds)}</Text>
           </Pressable>
@@ -139,6 +147,7 @@ export function VoiceCallModal({ visible, onClose }: Props) {
   const [isMuted, setIsMuted] = React.useState(false);
   const [isSpeaker, setIsSpeaker] = React.useState(true);
   const [transcriptMessages, setTranscriptMessages] = React.useState<Array<{ sender: string; text: string }>>([]);
+  const [callError, setCallError] = React.useState<string | null>(null);
 
   const [summaryMedication, setSummaryMedication] = React.useState('');
   const [summaryDescription, setSummaryDescription] = React.useState('');
@@ -150,26 +159,33 @@ export function VoiceCallModal({ visible, onClose }: Props) {
     setCallPhase('ringing');
     setTimerSeconds(0);
     setTranscriptMessages([]);
+    setCallError(null);
 
     const sampleMed = medications[0]?.name ?? 'Paracetamol 500mg';
     setSummaryMedication(sampleMed);
     setSummaryDescription('Consulta de adherencia y síntomas');
 
     startVapiCall(user.name || 'Omar', medications, {
-      onCallStart: () => setCallPhase('connected'),
+      onCallStart: () => {
+        setCallPhase('connected');
+        setCallError(null);
+      },
       onCallEnd: () => setCallPhase('summary'),
       onTranscript: (text, sender) => {
         setTranscriptMessages(prev => [...prev, { sender, text }]);
         if (text.length > 5 && sender === user.name)
           setSummaryDescription(text);
       },
-      onError: () => setCallPhase('connected'),
+      onError: (err) => {
+        console.warn('Vapi error in modal:', err);
+        setCallError('Permite el acceso al micrófono para hablar con aloRAM.');
+      },
     });
 
     const fallback = setTimeout(() => {
-      setCallPhase('connected');
+      setCallPhase(prev => (prev === 'ringing' ? 'connected' : prev));
       setTranscriptMessages(prev => prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user.name || 'Omar'}! Soy aloRAM. ¿Cómo te sientes hoy con tu ${sampleMed}?` }] : prev);
-    }, 1500);
+    }, 2000);
 
     return () => {
       clearTimeout(fallback);
@@ -213,7 +229,7 @@ export function VoiceCallModal({ visible, onClose }: Props) {
             <IASummaryReportView medication={summaryMedication} setMedication={setSummaryMedication} description={summaryDescription} setDescription={setSummaryDescription} severity={summarySeverity} setSeverity={setSummarySeverity} onClose={onClose} onSave={handleSaveSummary} />
           )
         : (
-            <SesamePhoneCallScreen timerSeconds={timerSeconds} isRinging={callPhase === 'ringing'} messages={transcriptMessages} isMuted={isMuted} isSpeaker={isSpeaker} onToggleMute={handleToggleMute} onToggleSpeaker={() => setIsSpeaker(!isSpeaker)} onEndCall={handleEndCall} />
+            <SesamePhoneCallScreen timerSeconds={timerSeconds} isRinging={callPhase === 'ringing'} messages={transcriptMessages} isMuted={isMuted} isSpeaker={isSpeaker} callError={callError} onToggleMute={handleToggleMute} onToggleSpeaker={() => setIsSpeaker(!isSpeaker)} onEndCall={handleEndCall} />
           )}
     </Modal>
   );

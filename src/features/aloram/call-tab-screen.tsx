@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { FocusAwareStatusBar, Input, Pressable, ScrollView, Text, View } from '@/components/ui';
+import { PhoneIcon } from '@/components/ui/icons';
 import { setVapiMuted, startVapiCall, stopVapiCall } from '@/lib/vapi';
 import { useAloRAMStore } from './store/use-aloram-store';
 
@@ -31,7 +32,7 @@ function SummaryCardView({ med, setMed, desc, setDesc, sev, setSev, onSave }: an
   );
 }
 
-function SesamePhoneCallTabInterface({ callState, timerSeconds, messages, isMuted, isSpeaker, onStartCall, onEndCall, onToggleMute, onToggleSpeaker }: any) {
+function SesamePhoneCallTabInterface({ callState, timerSeconds, messages, isMuted, isSpeaker, callError, onStartCall, onEndCall, onToggleMute, onToggleSpeaker }: any) {
   const formatTimer = (sec: number) => `${Math.floor(sec / 60).toString().padStart(2, '0')}:${(sec % 60).toString().padStart(2, '0')}`;
 
   let noteStatusText = 'Presiona abajo para llamar a aloRAM';
@@ -49,6 +50,13 @@ function SesamePhoneCallTabInterface({ callState, timerSeconds, messages, isMute
       </View>
 
       <View className="my-auto flex-1 justify-center px-2">
+        {callError && (
+          <View className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <Text className="text-xs font-bold text-amber-800">⚠️ Aviso de Conexión</Text>
+            <Text className="mt-1 text-xs text-amber-700">{callError}</Text>
+          </View>
+        )}
+
         <View className="space-y-3 rounded-3xl border border-stone-200/70 bg-white p-6 shadow-xl">
           <View className="flex-row items-center space-x-2 border-b border-stone-100 pb-3">
             <Text className="text-base">📝</Text>
@@ -91,7 +99,9 @@ function SesamePhoneCallTabInterface({ callState, timerSeconds, messages, isMute
         {callState === 'idle'
           ? (
               <Pressable onPress={onStartCall} className="w-full flex-row items-center justify-center rounded-full bg-stone-900 py-4 shadow-xl active:bg-black">
-                <Text className="mr-2 text-xl">📞</Text>
+                <View className="mr-2">
+                  <PhoneIcon color="#ffffff" size={22} />
+                </View>
                 <Text className="text-lg font-black text-white">Llamar a aloRAM</Text>
               </Pressable>
             )
@@ -99,7 +109,7 @@ function SesamePhoneCallTabInterface({ callState, timerSeconds, messages, isMute
               <View className="flex-row items-center justify-between rounded-full border border-stone-300/40 bg-[#E8E4D9] p-2.5 shadow-md">
                 <Pressable onPress={onEndCall} className="flex-row items-center space-x-3 rounded-full bg-white px-4 py-2.5 shadow-xs active:bg-red-50">
                   <View className="size-7 items-center justify-center rounded-full bg-red-100">
-                    <Text className="text-xs font-bold text-red-600">📞</Text>
+                    <PhoneIcon color="#dc2626" size={16} />
                   </View>
                   <Text className="text-sm font-extrabold text-stone-800">{formatTimer(timerSeconds)}</Text>
                 </Pressable>
@@ -130,6 +140,7 @@ export function CallTabScreen() {
   const [isMuted, setIsMuted] = React.useState(false);
   const [isSpeaker, setIsSpeaker] = React.useState(true);
   const [messages, setMessages] = React.useState<Array<{ sender: string; text: string }>>([]);
+  const [callError, setCallError] = React.useState<string | null>(null);
 
   const [summaryMed, setSummaryMed] = React.useState('');
   const [summaryDesc, setSummaryDesc] = React.useState('');
@@ -139,25 +150,34 @@ export function CallTabScreen() {
     setCallState('ringing');
     setTimerSeconds(0);
     setMessages([]);
+    setCallError(null);
     const sampleMed = medications[0]?.name ?? 'Paracetamol 500mg';
     setSummaryMed(sampleMed);
     setSummaryDesc('Consulta de adherencia y síntomas por voz');
 
     startVapiCall(user.name || 'Omar', medications, {
-      onCallStart: () => setCallState('connected'),
-      onCallEnd: () => setCallState('summary'),
+      onCallStart: () => {
+        setCallState('connected');
+        setCallError(null);
+      },
+      onCallEnd: () => {
+        setCallState('summary');
+      },
       onTranscript: (text, sender) => {
         setMessages(prev => [...prev, { sender, text }]);
         if (text.length > 5 && sender === user.name)
           setSummaryDesc(text);
       },
-      onError: () => setCallState('connected'),
+      onError: (err) => {
+        console.warn('Vapi error in screen:', err);
+        setCallError('Permite el acceso al micrófono en tu navegador o dispositivo para iniciar la llamada de voz con aloRAM.');
+      },
     });
 
     setTimeout(() => {
-      setCallState('connected');
+      setCallState(prev => (prev === 'ringing' ? 'connected' : prev));
       setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user.name || 'Omar'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?` }] : prev));
-    }, 1500);
+    }, 2000);
   };
 
   const handleSaveSummary = () => {
@@ -191,7 +211,7 @@ export function CallTabScreen() {
             <SummaryCardView med={summaryMed} setMed={setSummaryMed} desc={summaryDesc} setDesc={setSummaryDesc} sev={summarySev} setSev={setSummarySev} onSave={handleSaveSummary} />
           )
         : (
-            <SesamePhoneCallTabInterface callState={callState} timerSeconds={timerSeconds} messages={messages} isMuted={isMuted} isSpeaker={isSpeaker} onStartCall={handleStartCall} onEndCall={handleEndCall} onToggleMute={handleToggleMute} onToggleSpeaker={() => setIsSpeaker(!isSpeaker)} />
+            <SesamePhoneCallTabInterface callState={callState} timerSeconds={timerSeconds} messages={messages} isMuted={isMuted} isSpeaker={isSpeaker} callError={callError} onStartCall={handleStartCall} onEndCall={handleEndCall} onToggleMute={handleToggleMute} onToggleSpeaker={() => setIsSpeaker(!isSpeaker)} />
           )}
     </View>
   );
