@@ -1,4 +1,5 @@
 import VapiWeb from '@vapi-ai/web';
+import * as Speech from 'expo-speech';
 import { NativeModules, Platform } from 'react-native';
 import 'react-native-get-random-values';
 
@@ -8,18 +9,39 @@ export const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3
 let vapiInstance: any = null;
 
 export function speakText(text: string) {
+  try {
+    Speech.stop();
+    Speech.speak(text, {
+      language: 'es-ES',
+      rate: 0.95,
+      pitch: 1.0,
+    });
+  }
+  catch {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+      catch {}
+    }
+  }
+}
+
+export function stopSpeech() {
+  try {
+    Speech.stop();
+  }
+  catch {}
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-ES';
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
     }
-    catch (e) {
-      console.warn('SpeechSynthesis warning:', e);
-    }
+    catch {}
   }
 }
 
@@ -216,6 +238,7 @@ export async function startVapiCall(
 }
 
 export function stopVapiCall() {
+  stopSpeech();
   if (vapiInstance) {
     try {
       vapiInstance.stop();

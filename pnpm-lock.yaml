@@ -77,6 +77,9 @@ importers:
       expo-router:
         specifier: ~6.0.22
         version: 6.0.22(4a6017a91b786242661fffb6a6a94848)
+      expo-speech:
+        specifier: ^57.0.2
+        version: 57.0.2(expo@54.0.32)
       expo-splash-screen:
         specifier: ~31.0.13
         version: 31.0.13(expo@54.0.32)
@@ -4536,6 +4539,11 @@ packages:
   expo-server@1.0.5:
     resolution: {integrity: sha512-IGR++flYH70rhLyeXF0Phle56/k4cee87WeQ4mamS+MkVAVP+dDlOHf2nN06Z9Y2KhU0Gp1k+y61KkghF7HdhA==}
     engines: {node: '>=20.16.0'}
+
+  expo-speech@57.0.2:
+    resolution: {integrity: sha512-ngh/MwA9Yw7s7VuhekFnluz6JdxX59daJsr+WWgQf+Js2eHUSFoOhSoCWOVpw6YYcmrCkXMse91Hm6wxRNWpIA==}
+    peerDependencies:
+      expo: '*'
 
   expo-splash-screen@31.0.13:
     resolution: {integrity: sha512-1epJLC1cDlwwj089R2h8cxaU5uk4ONVAC+vzGiTZH4YARQhL4Stlz1MbR6yAS173GMosvkE6CAeihR7oIbCkDA==}
@@ -13416,6 +13424,10 @@ snapshots:
       - supports-color
 
   expo-server@1.0.5: {}
+
+  expo-speech@57.0.2(expo@54.0.32):
+    dependencies:
+      expo: 54.0.32(@babel/core@7.28.6)(@expo/metro-runtime@6.1.2)(expo-router@6.0.22)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
 
   expo-splash-screen@31.0.13(expo@54.0.32):
     dependencies:
