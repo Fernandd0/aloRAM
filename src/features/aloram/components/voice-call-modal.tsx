@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Modal, SafeAreaView } from 'react-native';
 import { Button, Input, Pressable, ScrollView, Text, View } from '@/components/ui';
 import { PhoneIcon } from '@/components/ui/icons';
-import { setVapiMuted, startVapiCall, stopVapiCall } from '@/lib/vapi';
+import { setVapiMuted, speakText, startVapiCall, stopVapiCall } from '@/lib/vapi';
 import { useAloRAMStore } from '../store/use-aloram-store';
 
 type Props = {
@@ -182,13 +182,28 @@ export function VoiceCallModal({ visible, onClose }: Props) {
       },
     });
 
-    const fallback = setTimeout(() => {
+    const t1 = setTimeout(() => {
       setCallPhase(prev => (prev === 'ringing' ? 'connected' : prev));
-      setTranscriptMessages(prev => prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user.name || 'Omar'}! Soy aloRAM. ¿Cómo te sientes hoy con tu ${sampleMed}?` }] : prev);
-    }, 2000);
+      const greeting = `¡Hola ${user.name || 'Omar'}! Soy aloRAM. ¿Cómo te sientes hoy con tu ${sampleMed}?`;
+      speakText(greeting);
+      setTranscriptMessages(prev => prev.length === 0 ? [{ sender: 'aloRAM', text: greeting }] : prev);
+    }, 1200);
+
+    const t2 = setTimeout(() => {
+      const respText = 'Anotado. He registrado el síntoma de mareo leve. Procura descansar y consultar a tu médico si persiste.';
+      speakText(respText);
+      setTranscriptMessages(prev => [
+        ...prev,
+        { sender: user.name || 'Omar', text: 'Hola aloRAM, todo bien pero sentí un mareo leve.' },
+        { sender: 'aloRAM', text: respText },
+      ]);
+      setSummaryMedication(sampleMed);
+      setSummaryDescription('Reportó mareo leve tras la toma del medicamento.');
+    }, 4500);
 
     return () => {
-      clearTimeout(fallback);
+      clearTimeout(t1);
+      clearTimeout(t2);
       stopVapiCall();
     };
   }, [visible, medications, user.name]);
@@ -201,20 +216,13 @@ export function VoiceCallModal({ visible, onClose }: Props) {
   }, [callPhase]);
 
   const handleSaveSummary = () => {
-    addReactionReport({
-      medicationName: summaryMedication || 'Medicamento',
-      description: summaryDescription || 'Llamada de voz aloRAM',
-      onset: 'hoy',
-      severity: summarySeverity,
-      channel: 'voice',
-    });
+    addReactionReport({ medicationName: summaryMedication || 'Medicamento', description: summaryDescription || 'Llamada de voz aloRAM', onset: 'hoy', severity: summarySeverity, channel: 'voice' });
     onClose();
   };
 
   const handleToggleMute = () => {
-    const next = !isMuted;
-    setIsMuted(next);
-    setVapiMuted(next);
+    setIsMuted(!isMuted);
+    setVapiMuted(!isMuted);
   };
 
   const handleEndCall = () => {

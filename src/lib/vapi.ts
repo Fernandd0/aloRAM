@@ -7,6 +7,22 @@ export const VAPI_ASSISTANT_ID = process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID || '3
 
 let vapiInstance: any = null;
 
+export function speakText(text: string) {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+    catch (e) {
+      console.warn('SpeechSynthesis warning:', e);
+    }
+  }
+}
+
 function createMockVapi(noticeMessage?: string) {
   const listeners: Record<string, Array<(...args: any[]) => void>> = {};
   let timer: any = null;
@@ -31,18 +47,28 @@ function createMockVapi(noticeMessage?: string) {
         }
       }
       timer = setTimeout(() => {
+        const text = noticeMessage || '¡Hola! Soy aloRAM, tu asistente de salud. ¿Cómo te sientes hoy con tu tratamiento?';
+        speakText(text);
         if (listeners.message) {
           for (const fn of listeners.message) {
             fn({
               type: 'transcript',
               role: 'assistant',
-              transcript: noticeMessage || '¡Hola! Soy aloRAM, tu asistente de salud. ¿Cómo te sientes hoy con tu tratamiento?',
+              transcript: text,
             });
           }
         }
       }, 500);
     },
     stop: () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+        }
+        catch (e) {
+          console.warn('SpeechSynthesis cancel warning:', e);
+        }
+      }
       if (timer) {
         clearTimeout(timer);
       }

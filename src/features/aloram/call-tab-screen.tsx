@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FocusAwareStatusBar, Input, Pressable, ScrollView, Text, View } from '@/components/ui';
 import { PhoneIcon } from '@/components/ui/icons';
-import { setVapiMuted, startVapiCall, stopVapiCall } from '@/lib/vapi';
+import { setVapiMuted, speakText, startVapiCall, stopVapiCall } from '@/lib/vapi';
 import { useAloRAMStore } from './store/use-aloram-store';
 
 function SummaryCardView({ med, setMed, desc, setDesc, sev, setSev, onSave }: any) {
@@ -176,8 +176,22 @@ export function CallTabScreen() {
 
     setTimeout(() => {
       setCallState(prev => (prev === 'ringing' ? 'connected' : prev));
-      setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: `¡Hola ${user?.name || 'Omar'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?` }] : prev));
-    }, 2000);
+      const greeting = `¡Hola ${user?.name || 'Omar'}! Soy aloRAM. ¿Cómo estás hoy con tu ${sampleMed}?`;
+      speakText(greeting);
+      setMessages(prev => (prev.length === 0 ? [{ sender: 'aloRAM', text: greeting }] : prev));
+    }, 1200);
+
+    setTimeout(() => {
+      const responseText = 'Entendido. Registré el síntoma de mareo leve. Descansa un momento y si el síntoma se intensifica, acude a tu centro de salud.';
+      speakText(responseText);
+      setMessages(prev => [
+        ...prev,
+        { sender: user?.name || 'Omar', text: 'Hola aloRAM, me he sentido un poco mareado hoy.' },
+        { sender: 'aloRAM', text: responseText },
+      ]);
+      setSummaryMed(sampleMed);
+      setSummaryDesc('Reportó mareo leve tras la toma habitual de su medicamento.');
+    }, 4500);
   };
 
   const handleSaveSummary = () => {
