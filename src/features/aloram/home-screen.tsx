@@ -28,7 +28,7 @@ function CallBannerCard({ onOpenCall }: { onOpenCall: () => void }) {
 
 function FixedBottomCallButton({ onOpenCall }: { onOpenCall: () => void }) {
   return (
-    <View className="absolute right-4 bottom-3 left-4 z-20">
+    <View className="absolute inset-x-4 bottom-3 z-20">
       <Pressable
         onPress={onOpenCall}
         className="flex-row items-center justify-between rounded-full border border-emerald-400/40 bg-emerald-600 px-5 py-3.5 shadow-xl active:bg-emerald-700"

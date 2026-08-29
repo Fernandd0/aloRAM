@@ -31,6 +31,16 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="call"
+        options={{
+          title: 'Llamar',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FeedIcon color={color} />,
+          tabBarButtonTestID: 'call-tab',
+        }}
+      />
+
+      <Tabs.Screen
         name="history"
         options={{
           title: 'Historial',
@@ -38,6 +48,7 @@ export default function TabLayout() {
           tabBarButtonTestID: 'history-tab',
         }}
       />
+
       <Tabs.Screen
         name="settings"
         options={{
