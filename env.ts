@@ -24,24 +24,24 @@ const EXPO_PUBLIC_APP_ENV = (process.env.EXPO_PUBLIC_APP_ENV
   ?? 'development') as z.infer<typeof envSchema>['EXPO_PUBLIC_APP_ENV'];
 
 const BUNDLE_IDS = {
-  development: 'com.vacunacare.development',
-  preview: 'com.vacunacare.preview',
-  production: 'com.vacunacare',
+  development: 'com.aloram.development',
+  preview: 'com.aloram.preview',
+  production: 'com.aloram',
 } as const;
 
 const PACKAGES = {
-  development: 'com.vacunacare.development',
-  preview: 'com.vacunacare.preview',
-  production: 'com.vacunacare',
+  development: 'com.aloram.development',
+  preview: 'com.aloram.preview',
+  production: 'com.aloram',
 } as const;
 
 const SCHEMES = {
-  development: 'vacunacare',
-  preview: 'vacunacare.preview',
-  production: 'vacunacare',
+  development: 'aloram',
+  preview: 'aloram.preview',
+  production: 'aloram',
 } as const;
 
-const NAME = 'VacunaCare';
+const NAME = 'aloRAM';
 
 // Check if strict validation is required (before prebuild)
 const STRICT_ENV_VALIDATION = process.env.STRICT_ENV_VALIDATION === '1';

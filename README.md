@@ -1,18 +1,46 @@
-# VacunaCare - Sistema de Control y Registro Digital de Vacunas
+# aloRAM — Asistente de Control de Medicamentos y Check-in por Voz
 
-VacunaCare es una aplicación móvil desarrollada en React Native y Expo para la gestión, consulta y seguimiento de esquemas de vacunación con registro y autenticación vía DNI (Documento Nacional de Identidad).
+**aloRAM** es una aplicación móvil cálida, sencilla y conversacional para gestionar tus medicamentos personales y evaluar cómo te sientes día a día.
 
-## Características Principales
+---
 
-- 🆔 **Registro Inicial con DNI**: Validación de documento nacional de identidad al inicio.
-- 💉 **Carnet Digital de Vacunación**: Muestra el carnet con código y estado activo del usuario.
-- 🛡️ **Seguridad y Validación**: Control de esquema completo y refuerzos.
-- 🌐 **Soporte Multilingüe**: Español e Inglés.
+## 🌟 Características Principales
 
-## Scripts Disponibles
+1. **Llamadas de Voz Conversacionales (Estilo Sesame AI)**:
+   - aloRAM realiza una llamada de voz amigable para preguntarte cómo te sienta tu medicamento.
+   - Transcripción en vivo en pantalla y resumen automático estructurado ("Esto fue lo que entendí").
 
-- `pnpm start`: Inicia el servidor de desarrollo Expo.
-- `pnpm ios`: Ejecuta en simulador iOS.
-- `pnpm android`: Ejecuta en emulador Android.
-- `pnpm type-check`: Ejecuta la verificación de tipos con TypeScript.
-- `pnpm lint`: Revisa el código con ESLint.
+2. **Registro Conversacional de Medicamentos**:
+   - Asistente paso a paso para añadir un medicamento (Nombre, Dosis, Frecuencia, Hora, Motivo, Duración).
+
+3. **Reporte de Síntomas por Chat o Voz**:
+   - Evaluación guiada con escala de severidad (Leve / Molesto / Fuerte).
+   - Alerta médica de emergencia inmediata si se reportan síntomas severos.
+
+4. **Historial de Tratamiento**:
+   - Cronograma con filtros por medicamento y canal (Voz / Chat).
+
+5. **Ajustes y Contacto de Emergencia**:
+   - Preferencias de comunicación (Llamada, Mensaje, Ambas), contacto de emergencia y política de privacidad transparente.
+
+---
+
+## 🚀 Inicio Rápido
+
+Instalar dependencias:
+
+```bash
+pnpm install
+```
+
+Iniciar servidor Expo (Probar con la app Expo Go en tu celular):
+
+```bash
+pnpm start
+```
+
+Verificación y Pruebas:
+
+```bash
+pnpm check-all
+```

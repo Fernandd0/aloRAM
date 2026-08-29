@@ -1,7 +1,6 @@
-import { Link, Redirect, Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import * as React from 'react';
 
-import { Pressable, Text } from '@/components/ui';
 import {
   Feed as FeedIcon,
   Settings as SettingsIcon,
@@ -25,20 +24,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Carnet Vacunas',
+          title: 'Mi Día',
           tabBarIcon: ({ color }) => <FeedIcon color={color} />,
-          headerRight: () => <CreateNewPostLink />,
           tabBarButtonTestID: 'feed-tab',
         }}
       />
 
       <Tabs.Screen
-        name="style"
+        name="history"
         options={{
-          title: 'Componentes',
-          headerShown: false,
+          title: 'Historial',
           tabBarIcon: ({ color }) => <StyleIcon color={color} />,
-          tabBarButtonTestID: 'style-tab',
+          tabBarButtonTestID: 'history-tab',
         }}
       />
       <Tabs.Screen
@@ -51,15 +48,5 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
-  );
-}
-
-function CreateNewPostLink() {
-  return (
-    <Link href="/feed/add-post" asChild>
-      <Pressable>
-        <Text className="px-3 font-semibold text-primary-600">+ Vacuna</Text>
-      </Pressable>
-    </Link>
   );
 }

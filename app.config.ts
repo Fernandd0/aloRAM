@@ -8,7 +8,7 @@ import 'tsx/cjs';
 // eslint-disable-next-line perfectionist/sort-imports
 import Env from './env';
 
-const EXPO_ACCOUNT_OWNER = 'vacunacare';
+const EXPO_ACCOUNT_OWNER = 'aloram';
 const EAS_PROJECT_ID = 'c3e1075b-6fe7-4686-aa49-35b46a229044';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   description: `${Env.EXPO_PUBLIC_NAME} Mobile App`,
   owner: EXPO_ACCOUNT_OWNER,
   scheme: Env.EXPO_PUBLIC_SCHEME,
-  slug: 'vacunacare',
+  slug: 'aloram',
   version: Env.EXPO_PUBLIC_VERSION.toString(),
   orientation: 'portrait',
   icon: './assets/icon.png',
