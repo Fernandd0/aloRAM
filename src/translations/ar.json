@@ -1,0 +1,48 @@
+{
+  "auth": {
+    "confirm_password": "تأكيد كلمة المرور",
+    "dni": "رقم الهوية",
+    "dni_placeholder": "أدخل رقم الهوية",
+    "email": "البريد الإلكتروني",
+    "has_account": "هل لديك حساب بالفعل؟",
+    "login": "تسجيل الدخول",
+    "login_here": "تسجيل الدخول هنا",
+    "name": "الاسم الكامل",
+    "no_account": "ليس لديك حساب؟",
+    "password": "كلمة المرور",
+    "register": "التسجيل برقم الهوية",
+    "register_here": "سجل هنا"
+  },
+  "onboarding": {
+    "message": "مرحبا بكم في تطبيق VacunaCare"
+  },
+  "settings": {
+    "about": "حول التطبيق ",
+    "app_name": "اسم التطبيق",
+    "arabic": "عربي",
+    "english": "إنجليزي",
+    "generale": "عام",
+    "github": "جيثب",
+    "language": "لغة",
+    "links": "الروابط",
+    "logout": "تسجيل خروج",
+    "more": "أكثر",
+    "privacy": "سياسة الخصوصية",
+    "rate": "تقييم",
+    "share": "شارك",
+    "spanish": "إسباني",
+    "support": "الدعم",
+    "support_us": "ادعمنا",
+    "terms": "شروط الخدمة",
+    "theme": {
+      "dark": "مظلم",
+      "light": "خفيفة",
+      "system": "النظام",
+      "title": "سمة"
+    },
+    "title": "إعدادات",
+    "version": "إصدار",
+    "website": "موقع الكتروني"
+  },
+  "welcome": "VacunaCare"
+}

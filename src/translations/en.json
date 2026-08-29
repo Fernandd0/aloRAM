@@ -1,0 +1,48 @@
+{
+  "auth": {
+    "confirm_password": "Confirm Password",
+    "dni": "DNI (National ID)",
+    "dni_placeholder": "Enter your DNI (e.g. 12345678)",
+    "email": "Email",
+    "has_account": "Already have an account?",
+    "login": "Sign In",
+    "login_here": "Sign in",
+    "name": "Full Name",
+    "no_account": "Don't have an account?",
+    "password": "Password",
+    "register": "Register with DNI",
+    "register_here": "Register here"
+  },
+  "onboarding": {
+    "message": "Welcome to VacunaCare"
+  },
+  "settings": {
+    "about": "About",
+    "app_name": "App Name",
+    "arabic": "Arabic",
+    "english": "English",
+    "generale": "General",
+    "github": "Github",
+    "language": "Language",
+    "links": "Links",
+    "logout": "Logout",
+    "more": "More",
+    "privacy": "Privacy Policy",
+    "rate": "Rate",
+    "share": "Share",
+    "spanish": "Spanish",
+    "support": "Support",
+    "support_us": "Support Us",
+    "terms": "Terms of Service",
+    "theme": {
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System",
+      "title": "Theme"
+    },
+    "title": "Settings",
+    "version": "Version",
+    "website": "Website"
+  },
+  "welcome": "Welcome to VacunaCare"
+}
